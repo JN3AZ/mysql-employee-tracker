@@ -1,6 +1,7 @@
 // Here are the dependencies for the project
 const inquirer = require("inquirer");
 const mysql = require("mysql");
+const cTable = require('console.table');
 
 // setting up the mysql database connection
 const connection = mysql.createConnection({
@@ -8,7 +9,7 @@ const connection = mysql.createConnection({
   port: "3306",
   user: "root",
   password: "",
-  databasse: "employeesDB",
+  database: "employeesDB",
 });
 
 //here we are going to begin the connection to mysql
@@ -382,7 +383,7 @@ function viewEmployee_Department() {
           );
           console.log("\n\n\n");
 
-          promptQuit();
+          promptExit();
         });
       });
   });
@@ -443,7 +444,7 @@ function viewEmployee_Role() {
           );
           console.log("\n\n\n");
 
-          promptQuit();
+          promptExit();
         });
       });
   });
@@ -456,11 +457,11 @@ function promptExit() {
       type: "list",
       name: "promptExit",
       message: "Would you like to quit this application or run again?",
-      choices: ["Run Again", "Quit"],
+      choices: ["Run Again", "Exit"],
     })
     .then(function (res) {
       if (res.promptExit === "Run Again") {
-        runApp();
+        startApp();
       } else {
         connection.end();
       }
