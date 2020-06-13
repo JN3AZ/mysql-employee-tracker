@@ -81,7 +81,7 @@ function startApp() {
 
 //Here is the process to add a new employee to the database
 function addEmployee() {
-  connection.query("SELECT * FROM employee_role", function (err, res) {
+  connection.query("SELECT * FROM employeeRole", function (err, res) {
     if (err) throw err;
 
     inquirer
@@ -204,7 +204,7 @@ function addRole() {
             if (err) throw err;
             console.log(res[0].id);
 
-            connection.query("INSERT INTO employee_role SET ?", {
+            connection.query("INSERT INTO employeeRole SET ?", {
               title: res.roleTitle,
               salary: parseInt(res.roleSalary),
               department_id: parseInt(res[0].id),
@@ -245,7 +245,7 @@ function seeEmployees() {
   var listOfEmployeesArray = [];
 
   var query =
-    "SELECT employee.id, first_name, last_name, title, salary, moniker FROM employee JOIN employee_role ON (employee.role_id = employee_role.id) JOIN department ON (department.id = employee_role.department_id)";
+    "SELECT employee.id, first_name, last_name, title, salary, moniker FROM employee JOIN employeeRole ON (employee.role_id = employeeRole.id) JOIN department ON (department.id = employeeRole.department_id)";
 
   connection.query(query, function (err, res) {
     if (err) throw err;
@@ -279,7 +279,7 @@ function seeEmployees() {
 ////setting up the ability to search for a specific employee
 function locateEmployee() {
   var query =
-    "SELECT employee.id, first_name, last_name, title, salary, moniker FROM employee JOIN employee_role ON (employee.role_id = employee_role.id) JOIN department ON (department.id = employee_role.department_id)";
+    "SELECT employee.id, first_name, last_name, title, salary, moniker FROM employee JOIN employeeRole ON (employee.role_id = employeeRole.id) JOIN department ON (department.id = employeeRole.department_id)";
 
   inquirer
     .prompt([
@@ -333,7 +333,7 @@ function locateEmployee() {
 //setting up the ablity to search for an employee based off of the department they belong to.
 function viewEmployee_Department() {
   var query =
-    "SELECT employee.id, first_name, last_name, title, salary, moniker FROM employee JOIN employee_role ON (employee.role_id = employee_role.id) JOIN department ON (department.id = employee_role.department_id)";
+    "SELECT employee.id, first_name, last_name, title, salary, moniker FROM employee JOIN employeeRole ON (employee.role_id = employeeRole.id) JOIN department ON (department.id = employeeRole.department_id)";
 
   connection.query("SELECT * FROM department", function (err, res) {
     if (err) throw err;
@@ -392,9 +392,9 @@ function viewEmployee_Department() {
 // searches employee by role
 function viewEmployee_Role() {
   var query =
-    "SELECT employee.id, first_name, last_name, title, salary, moniker FROM employee JOIN employee_role ON (employee.role_id = employee_role.id) JOIN department ON (department.id = employee_role.department_id)";
+    "SELECT employee.id, first_name, last_name, title, salary, moniker FROM employee JOIN employeeRole ON (employee.role_id = employeeRole.id) JOIN department ON (department.id = employeeRole.department_id)";
 
-  connection.query("SELECT * FROM employee_role", function (err, res) {
+  connection.query("SELECT * FROM employeeRole", function (err, res) {
     if (err) throw err;
 
     console.log(res);
