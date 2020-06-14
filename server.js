@@ -76,7 +76,7 @@ function menuPrompt() {
           deleteRole();
           break;
 
-        case "Add another department":
+        case "Add a Department":
           addDepartment();
           break;
 
@@ -333,8 +333,14 @@ function addDepartment() {
 
 // Remove a department from the database
 function deleteDepartment() {
-  const query = `
-  SELECT id, department.moniker FROM department;`;
+  // connection.query(
+  //   "INSERT INTO department SET ?",
+  //   { moniker: answer.addDepartment },
+  //   function (err) {
+  //     if (err) throw err;
+  //   }
+  // );
+  const query = 'SELECT id, moniker FROM department;';
   connection.query(query, (err, res) => {
     if (err) throw err;
     //extract department names to array
@@ -378,37 +384,36 @@ function deleteDepartment() {
 
 // Here is the setup that allows all of the employees to be viewed by the user.
 function seeEmployees() {
-  var listOfEmployeesArray = [];
+  var employeeArray = [];
+  var employeeObj
 
   var query =
     "SELECT employee.id, first_name, last_name, title, salary, moniker FROM employee JOIN employeeRole ON (employee.role_id = employeeRole.id) JOIN department ON (department.id = employeeRole.department_id)";
 
   connection.query(query, function (err, res) {
     if (err) throw err;
-
-    var employeeArray = [];
-
+    console.log('response: ', res);
     for (var i = 0; i < res.length; i++) {
-      employeeArray = [];
-
-      employeeArray.push(res[i].id);
-      employeeArray.push(res[i].first_name);
-      employeeArray.push(res[i].last_name);
-      employeeArray.push(res[i].title);
-      employeeArray.push(res[i].salary);
-      employeeArray.push(res[i].moniker);
-
-      allEmployeeArray.push(employeeArray);
+     
+      employeeObj = {
+        id: res[i].id,
+        firstName: res[i].first_name,
+        lastName: res[i].last_name,
+        title: res[i].title,
+        salary: res[i].salary,
+        moniker: res[i].moniker
+      };
+      employeeArray.push(employeeObj);
     }
 
     console.log("\n\n\n");
     console.table(
       ["ID", "First Name", "Last Name", "Role", "Salary", "Department"],
-      listOfEmployeesArray
+        employeeArray
     );
     console.log("\n\n\n");
     //render screen
-    renderScreen("All Employees", tableData);
+    // renderScreen("All Employees", tableData);
     promptExit();
   });
 }
@@ -440,10 +445,9 @@ function locateEmployee() {
 
         // search database for specific searched employee
         for (var i = 0; i < res.length; i++) {
-          if (
-            result[i].first_name === answer.firstName &&
-            result[i].last_name === answer.lastName
-          ) {
+          if ( (result[i].first_name === answer.firstName) &&
+               (result[i].last_name === answer.lastName) ) {
+            
             searchEmployeeArray.push(res[i].id);
             searchEmployeeArray.push(res[i].first_name);
             searchEmployeeArray.push(res[i].last_name);
