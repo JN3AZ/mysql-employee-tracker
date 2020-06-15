@@ -24,14 +24,6 @@ function startApp() {
   menuPrompt();
 }
 
-// render table data and menu prompt
-function renderScreen(tableData) {
-  //log table to console
-  cTable(tableData);
-  //menu prompt
-  menuPrompt();
-}
-
 // here we are initializing the user prompts
 function menuPrompt() {
   // Here is the set up to start the questions for the user
