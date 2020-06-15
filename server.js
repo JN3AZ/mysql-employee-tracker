@@ -48,7 +48,6 @@ function menuPrompt() {
         "Add a Department",
         "Delete a Department",
         "See all employees",
-        "Search for an employee",
         "View Roles",
         "View Departments",
         "View employee by department",
@@ -86,10 +85,6 @@ function menuPrompt() {
 
         case "See all employees":
           seeEmployees();
-          break;
-
-        case "Search for an employee":
-          locateEmployee();
           break;
 
         case "View Roles":
@@ -265,8 +260,7 @@ function addRole() {
 
 // Remove a role from the database
 function deleteRole() {
-  const query = `
-  SELECT id, employeeRole.title FROM employeeRole;`;
+  const query = 'SELECT id, employeeRole.title FROM employeeRole;';
   connection.query(query, (err, res) => {
     if (err) throw err;
     //extract department names to array
@@ -297,12 +291,12 @@ function deleteRole() {
             break;
           }
         }
-        const query = "DELETE FROM role WHERE ?";
+        const query = "DELETE FROM employeeRole WHERE ?";
         connection.query(query, { id: chosenRoleID }, (err, res) => {
           if (err) throw err;
           console.log("Role Removed");
-          //show updated Role table
-          setTimeout(queryRolesOnly, 500);
+          
+          
         });
       });
   });
@@ -340,7 +334,7 @@ function deleteDepartment() {
   //     if (err) throw err;
   //   }
   // );
-  const query = 'SELECT id, moniker FROM department;';
+  const query = "SELECT id, moniker FROM department;";
   connection.query(query, (err, res) => {
     if (err) throw err;
     //extract department names to array
@@ -385,23 +379,22 @@ function deleteDepartment() {
 // Here is the setup that allows all of the employees to be viewed by the user.
 function seeEmployees() {
   var employeeArray = [];
-  var employeeObj
+  var employeeObj;
 
   var query =
     "SELECT employee.id, first_name, last_name, title, salary, moniker FROM employee JOIN employeeRole ON (employee.role_id = employeeRole.id) JOIN department ON (department.id = employeeRole.department_id)";
 
   connection.query(query, function (err, res) {
     if (err) throw err;
-    console.log('response: ', res);
+    console.log("response: ", res);
     for (var i = 0; i < res.length; i++) {
-     
       employeeObj = {
         id: res[i].id,
         firstName: res[i].first_name,
         lastName: res[i].last_name,
         title: res[i].title,
         salary: res[i].salary,
-        moniker: res[i].moniker
+        moniker: res[i].moniker,
       };
       employeeArray.push(employeeObj);
     }
@@ -409,7 +402,7 @@ function seeEmployees() {
     console.log("\n\n\n");
     console.table(
       ["ID", "First Name", "Last Name", "Role", "Salary", "Department"],
-        employeeArray
+      employeeArray
     );
     console.log("\n\n\n");
     //render screen
@@ -418,62 +411,9 @@ function seeEmployees() {
   });
 }
 
-////setting up the ability to search for a specific employee
-function locateEmployee() {
-  var query =
-    "SELECT employee.id, first_name, last_name, title, salary, moniker FROM employee JOIN employeeRole ON (employee.role_id = employeeRole.id) JOIN department ON (department.id = employeeRole.department_id)";
-
-  inquirer
-    .prompt([
-      {
-        name: "firstName",
-        type: "input",
-        message: "Employee's First Name?",
-      },
-      {
-        name: "lastName",
-        type: "input",
-        message: "Employee's Last Name?",
-      },
-    ])
-    .then(function (answer) {
-      var fullEmployeeArray = [];
-      var searchEmployeeArray = [];
-
-      connection.query(query, function (err, res) {
-        if (err) throw err;
-
-        // search database for specific searched employee
-        for (var i = 0; i < res.length; i++) {
-          if ( (result[i].first_name === answer.firstName) &&
-               (result[i].last_name === answer.lastName) ) {
-            
-            searchEmployeeArray.push(res[i].id);
-            searchEmployeeArray.push(res[i].first_name);
-            searchEmployeeArray.push(res[i].last_name);
-            searchEmployeeArray.push(res[i].title);
-            searchEmployeeArray.push(res[i].salary);
-            searchEmployeeArray.push(res[i].moniker);
-
-            fullEmployeeArray.push(searchEmployeeArray);
-          }
-        }
-
-        console.log("\n\n\n");
-        console.table(
-          ["ID", "First Name", "Last Name", "Role", "Salary", "Department"],
-          fullEmployeeArray
-        );
-        console.log("\n\n\n");
-
-        promptExit();
-      });
-    });
-}
-
 // Query the Roles only and display them for viewing
 function seeRolesOnly() {
-  const query = `SELECT id, title FROM employeesDB.employeeRole;`;
+  const query = "SELECT id, title FROM employeesDB.employeeRole;";
   //build table data array from query result
   connection.query(query, (err, res) => {
     if (err) throw err;
@@ -491,7 +431,7 @@ function seeRolesOnly() {
 
 // Query the departments without employees
 function seeDepartmentsOnly() {
-  const query = `SELECT id, department.moniker FROM department;`;
+  const query = "SELECT id, department.moniker FROM department;";
   connection.query(query, (err, res) => {
     if (err) throw err;
     //extract department names to array
