@@ -260,7 +260,7 @@ function addRole() {
 
 // Remove a role from the database
 function deleteRole() {
-  const query = 'SELECT id, employeeRole.title FROM employeeRole;';
+  const query = "SELECT id, employeeRole.title FROM employeeRole;";
   connection.query(query, (err, res) => {
     if (err) throw err;
     //extract department names to array
@@ -295,8 +295,6 @@ function deleteRole() {
         connection.query(query, { id: chosenRoleID }, (err, res) => {
           if (err) throw err;
           console.log("Role Removed");
-          
-          
         });
       });
   });
@@ -327,13 +325,6 @@ function addDepartment() {
 
 // Remove a department from the database
 function deleteDepartment() {
-  // connection.query(
-  //   "INSERT INTO department SET ?",
-  //   { moniker: answer.addDepartment },
-  //   function (err) {
-  //     if (err) throw err;
-  //   }
-  // );
   const query = "SELECT id, moniker FROM department;";
   connection.query(query, (err, res) => {
     if (err) throw err;
@@ -343,9 +334,9 @@ function deleteDepartment() {
     for (let i = 0; i < res.length; i++) {
       departments.push({
         id: res[i].id,
-        name: res[i].name,
+        moniker: res[i].moniker,
       });
-      departmentsNames.push(res[i].name);
+      departmentsNames.push(res[i].moniker);
     }
     //prompt for department to remove
     inquirer
@@ -360,7 +351,7 @@ function deleteDepartment() {
         const chosenDepartment = answer.departmentsPromptChoice;
         let chosenDepartmentId;
         for (let i = 0; i < departments.length; i++) {
-          if (departments[i].name === chosenDepartment) {
+          if (departments[i].moniker === chosenDepartment) {
             chosenDepartmentId = departments[i].id;
             break;
           }
@@ -369,8 +360,7 @@ function deleteDepartment() {
         connection.query(query, { id: chosenDepartmentId }, (err, res) => {
           if (err) throw err;
           console.log("Department Removed");
-          //show updated Department table
-          setTimeout(queryDepartmentsOnly, 500);
+          promptExit();
         });
       });
   });
