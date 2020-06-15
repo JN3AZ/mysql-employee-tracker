@@ -389,51 +389,61 @@ function seeEmployees() {
       employeeArray.push(employeeObj);
     }
 
-    console.log("\n\n\n");
+    console.log("\n");
     console.table(
       ["ID", "First Name", "Last Name", "Role", "Salary", "Department"],
       employeeArray
     );
-    console.log("\n\n\n");
-    //render screen
-    // renderScreen("All Employees", tableData);
+    console.log("\n");
+
     promptExit();
   });
 }
 
 // Query the Roles only and display them for viewing
 function seeRolesOnly() {
-  const query = "SELECT id, title FROM employeesDB.employeeRole;";
+  var employeeRoleArray = [];
+  var employeeRolesObj;
+  const query = "SELECT * FROM employeesDB.employeeRole;";
   //build table data array from query result
   connection.query(query, (err, res) => {
     if (err) throw err;
-    const tableData = [];
     for (let i = 0; i < res.length; i++) {
-      tableData.push({
-        ID: res[i].id,
-        Roles: res[i].title,
-      });
+      employeeRolesObj = {
+        id: res[i].id,
+        title: res[i].title,
+        salary: res[i].salary,
+        department_id: res[i].department_id,
+      };
+      employeeRoleArray.push(employeeRolesObj);
     }
-    // Show the Roles
-    renderScreen("All Roles", tableData);
+    console.log("\n");
+    console.table(employeeRoleArray);
+    console.log("\n");
+    promptExit();
   });
 }
 
 // Query the departments without employees
 function seeDepartmentsOnly() {
-  const query = "SELECT id, department.moniker FROM department;";
+  var departmentsArray = [];
+  var departmentsObj;
+  const query = "SELECT * FROM department;";
   connection.query(query, (err, res) => {
     if (err) throw err;
     //extract department names to array
-    const tableData = [];
+
     for (let i = 0; i < res.length; i++) {
-      tableData.push({
-        ID: res[i].id,
-        Departments: res[i].name,
-      });
+      departmentsObj = {
+        id: res[i].id,
+        moniker: res[i].moniker,
+      };
+      departmentsArray.push(departmentsObj);
     }
-    // Show the departments
-    renderScreen(`All Departments`, tableData);
+    console.log("\n");
+    console.table(departmentsArray);
+    console.log("\n");
+    promptExit();
   });
 }
 
@@ -483,12 +493,12 @@ function viewEmployee_Department() {
             }
           }
 
-          console.log("\n\n\n");
+          console.log("\n");
           console.table(
             ["ID", "First Name", "Last Name", "Role", "Salary", "Department"],
             fullDepartmentArray
           );
-          console.log("\n\n\n");
+          console.log("\n");
 
           promptExit();
         });
@@ -543,12 +553,12 @@ function viewEmployee_Role() {
             }
           }
 
-          console.log("\n\n\n");
+          console.log("\n");
           console.table(
             ["ID", "First Name", "Last Name", "Role", "Salary", "Department"],
             fullRoleArray
           );
-          console.log("\n\n\n");
+          console.log("\n");
 
           promptExit();
         });
@@ -557,26 +567,25 @@ function viewEmployee_Role() {
 }
 
 function updateEmployeeRole() {
+  let employees = [];
+  let employeeRoles = [];
   //initialize updatedEmployee object
-  const updatedEmployee = {
+  let updatedEmployee = {
     id: 0,
     roleID: 0,
   };
   //sql query for Employees
-  const query = `
-  SELECT id, concat(employee.first_name, " ", employee.last_name) AS employee_full_name
-  FROM employee ;`;
+  let query = `SELECT id, concat(employee.first_name, " ", employee.last_name) AS employee_full_name
+  FROM employee;`;
   connection.query(query, (err, res) => {
     if (err) throw err;
     //extract employee names and ids to arrays
-    let employees = [];
-    let employeesNames = [];
+
     for (let i = 0; i < res.length; i++) {
       employees.push({
         id: res[i].id,
-        fullName: res[i].employee_full_name,
+        employee_full_name: res[i].employee_full_name,
       });
-      employeesNames.push(res[i].employee_full_name);
     }
     //prompt for employee to update
     inquirer
@@ -584,14 +593,14 @@ function updateEmployeeRole() {
         type: "list",
         name: "employeePromptChoice",
         message: "Select employee to update:",
-        choices: employeesNames,
+        choices: employees,
       })
       .then((answer) => {
         //get id of chosen employee
         const chosenEmployee = answer.employeePromptChoice;
         let chosenEmployeeID;
         for (let i = 0; i < employees.length; i++) {
-          if (employees[i].fullName === chosenEmployee) {
+          if (employees[i].employee_full_name === chosenEmployee) {
             chosenEmployeeID = employees[i].id;
             break;
           }
@@ -599,18 +608,17 @@ function updateEmployeeRole() {
         //set updatedEmployee id
         updatedEmployee.id = chosenEmployeeID;
         //sql query for roles
-        const query = `SELECT employeeRole.employeRole.title, employeeRole.id FROM employeeRole;`;
+        const query = `SELECT id, title FROM employeeRole;`;
         connection.query(query, (err, res) => {
           if (err) throw err;
           //extract role names and ids to arrays
-          const roles = [];
-          const rolesNames = [];
+
+          let rolesNames = [];
           for (let i = 0; i < res.length; i++) {
-            roles.push({
+            rolesNames.push({
               id: res[i].id,
               title: res[i].title,
             });
-            rolesNames.push(res[i].title);
           }
           //prompt for role selection
           inquirer
@@ -624,9 +632,10 @@ function updateEmployeeRole() {
               //get id of chosen role
               const chosenRole = answer.rolePromptChoice;
               let chosenRoleID;
-              for (let i = 0; i < roles.length; i++) {
-                if (roles[i].title === chosenRole) {
-                  chosenRoleID = roles[i].id;
+              for (let i = 0; i < rolesNames.length; i++) {
+                if (rolesNames[i].title === chosenRole) {
+                  chosenRoleID = rolesNames[i].id;
+                  break;
                 }
               }
               //set updatedEmployee role ID
@@ -646,8 +655,6 @@ function updateEmployeeRole() {
                 (err, res) => {
                   if (err) throw err;
                   console.log("Employee Role Updated");
-                  //show updated employee table
-                  setTimeout(queryEmployeesAll, 500);
                 }
               );
             });
